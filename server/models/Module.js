@@ -9,6 +9,6 @@ const moduleSchema = new mongoose.Schema(
     },
     lessons: [{ type: mongoose.Schema.Types.ObjectId, ref: "Lesson" }],
   },
-  { timeStamps: true },
+  { timestamps: true },
 );
 module.exports = mongoose.model("Module", moduleSchema);
