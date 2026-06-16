@@ -8,15 +8,16 @@ const createCourseFlow = async (req, res) => {
     const { topic, creator } = req.body;
 
     if (!topic || !creator) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Topic and creator are required fields.",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Topic and creator are required fields.",
+      });
     }
 
     const aiOutline = await generateCourse(topic);
+    if (!aiOutline || !Array.isArray(aiOutline.modules)) {
+      throw new Error("Invalid AI Response format");
+    }
 
     const course = await Course.create({
       prompt: topic,

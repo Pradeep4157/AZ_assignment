@@ -1,0 +1,39 @@
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+require("dotenv").config(); // Loads environment variables from a .env file
+
+const courseRoutes = require("./routes/courseRoutes");
+
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+// 1. Global Middleware
+app.use(cors()); // Fixes the CORS cross-port security blocks
+app.use(express.json()); // Allows Express to parse JSON incoming request bodies
+
+// 2. Mount API Routes
+app.use("/api/courses", courseRoutes);
+
+// 3. MongoDB Connection
+// Replace the fallback string with your actual local or Atlas string if needed
+const MONGO_URI =
+  process.env.MONGO_URI || "mongodb://127.0.0.1:27017/ai_course_builder";
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    console.log("🚀 MongoDB Database connected successfully!");
+
+    // 4. Start listening for network traffic ONLY after DB is ready
+    app.listen(PORT, () => {
+      console.log(`📡 Server actively listening on: http://localhost:${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error(
+      "❌ Database connection failed to initialize:",
+      error.message,
+    );
+    process.exit(1);
+  });
