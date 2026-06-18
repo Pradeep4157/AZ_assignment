@@ -11,17 +11,18 @@ function PromptForm(){
             const response = await fetch("http://localhost:5000/api/courses/generate",{
                 method : "POST",
                 headers: {
-                    "Content-Type" :"body/json",
+                    "Content-Type" :"application/json",
                 },
                 body: JSON.stringify({
                     topic : topic,
-                    sender: "random_ass_name",
+                    creator: "random_ass_name",
                 }),
             });
             const result = await response.json();
+            
             if(result.success){
                 // then we got the proper response..
-                setMessage(`Success !! Course created with ID : ${result.courseid}`);
+                setMessage(`Success !! Course created with ID : ${result.courseId}`);
             }
 
         }catch(error){

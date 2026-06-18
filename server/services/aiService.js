@@ -2,10 +2,11 @@ const ollama = require("ollama").default;
 
 async function generateCourse(topic) {
   try {
+    console.log("nigga we reached generateCourse");
     const prompt = `
     Create a structured outline layout for a course on the topic: "${topic}".
     Provide 3 comprehensive modules, with each module containing 3 highly relevant lessons.
-    
+
     You must output your response inside this exact JSON format layout:
     {
       "title": "Course Title String",
@@ -42,6 +43,10 @@ async function generateCourse(topic) {
     });
 
     const outlineData = JSON.parse(response.message.content);
+    console.log(
+      " nigga we completed generateCourse and this is the outline data : ",
+      outlineData,
+    );
     return outlineData;
   } catch (error) {
     console.error("Ollama Outline Compilation Error:", error);

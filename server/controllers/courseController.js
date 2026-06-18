@@ -6,8 +6,12 @@ const generateCourse = require("../services/aiService");
 const createCourseFlow = async (req, res) => {
   try {
     const { topic, creator } = req.body;
+    console.log(
+      "we reached create course flow and this is what's stored inside req.body :  ",
+      req.body,
+    );
 
-    if (!topic || !creator) {
+    if (!topic) {
       return res.status(400).json({
         success: false,
         message: "Topic and creator are required fields.",
