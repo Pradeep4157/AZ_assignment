@@ -7,10 +7,10 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#030712] text-slate-100 font-sans selection:bg-emerald-500/30 relative overflow-x-hidden">
-        {/* Vercel-style background gradient radial beam */}
+
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-emerald-500/10 via-cyan-500/5 to-transparent blur-[120px] pointer-events-none" />
         
-        {/* Premium Grid Pattern Background Overlay */}
+        
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
         <header className="sticky top-0 z-50 max-w-7xl mx-auto px-6 h-16 flex items-center justify-between border-b border-white/[0.06] bg-[#030712]/70 backdrop-blur-md">

@@ -1,3 +1,124 @@
+// import {useState, useEffect} from "react";
+// import {Link} from "react-router-dom";
+
+// function DashBoard(){
+//   const [courses,setCourses] = useState(null);
+//   const [topic, setTopic] = useState("");
+//   const [loading, setLoading] = useState(true);
+//   const [genLoading, setGenLoading] = useState(false);
+//   const fetchCourses = async () => {
+//     try{
+      
+//       const response = await fetch("https://localhost:5000/");
+//       const result = await response.json();
+//       if(result.success){
+//         setCourses(result.data);
+//       }
+//     }catch(error){
+//       console.log("error occured while fetching courses.", error);
+
+//     }finally{
+//       setLoading(false);
+
+//     }
+//   }
+//   useEffect(() => {
+//     fetchCourses();
+//   },[]);
+//   const handleGenerate = async(e) => {
+//     try{
+//       setGenLoading(true);
+//       e.preventDefault();
+//       if(!e.trim()) return;
+//       const response = await fetch("https://localhost:5000/generate", {
+//         method : "POST",
+//         headers : {
+//           "Content-Type": "application/json",
+//         },
+//         body: {
+//           topic,
+//           creater : "system_admin",
+//         }
+//       });
+//       const result = await response.json();
+//       if(result.success){
+//         setTopic("");
+//         fetchCourses();
+//       }
+
+
+
+//     }catch(error){
+//       console.log("error occured while adding course", error);
+
+
+//     }finally{
+//       setGenLoading(false);
+      
+//     }
+//   }
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -116,9 +237,9 @@ function Dashboard() {
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
           <h2 className="text-lg font-medium text-white flex items-center gap-2 m-0">
-            <Layers className="h-4 w-4 text-slate-400" /> Architectural Registry
+            <Layers className="h-4 w-4 text-slate-400" /> Courses Generated
           </h2>
-          <span className="text-xs text-slate-500 font-mono">{courses.length} schemas indexed</span>
+          
         </div>
 
         {loading ? (
@@ -154,7 +275,7 @@ function Dashboard() {
                     to={`/course/${course._id}`} 
                     className="inline-flex items-center gap-1 font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
                   >
-                    View Node Map <ArrowRight className="h-3 w-3" />
+                    Start Learning <ArrowRight className="h-3 w-3" />
                   </Link>
                 </div>
               </motion.div>
