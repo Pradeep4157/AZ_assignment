@@ -1,16 +1,11 @@
 const Course = require("../models/Course");
 const Module = require("../models/Module");
 const Lesson = require("../models/Lesson");
-const generateCourse = require("../services/aiService");
+const {generateCourse, generateLessonContent} = require("../services/aiService");
 
 const createCourseFlow = async (req, res) => {
   try {
     const { topic, creator } = req.body;
-    console.log(
-      "we reached create course flow and this is what's stored inside req.body :  ",
-      req.body,
-    );
-
     if (!topic) {
       return res.status(400).json({
         success: false,
@@ -96,7 +91,11 @@ const getAllCourses = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-
+const generateLesson = async(req, res) => {
+  try{
+    const lessons = await 
+  }
+}
 module.exports = {
   createCourseFlow,
   getCourseById,
