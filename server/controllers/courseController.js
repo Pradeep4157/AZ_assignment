@@ -1,7 +1,10 @@
 const Course = require("../models/Course");
 const Module = require("../models/Module");
 const Lesson = require("../models/Lesson");
-const {generateCourse, generateLessonContent} = require("../services/aiService");
+const {
+  generateCourse,
+  generateLessonContent,
+} = require("../services/aiService");
 
 const createCourseFlow = async (req, res) => {
   try {
@@ -91,13 +94,51 @@ const getAllCourses = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-const generateLesson = async(req, res) => {
-  try{
-    const lessons = await 
+// generateLessonContent requires courseTitle, moduleTitle, lessonTitle. we have stored course._id, lesson._id, in the module so we can get it from there and send it here.
+const generateLesson = async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    const lesson = await Lesson.findById(lessonId).populate({
+      path: "module",
+      populate: {
+        path: "course",
+      },
+    });
+    if (!lesson) {
+      return res.status(404).json({
+        success: false,
+        message: "Lesson not found",
+      });
+    }
+    if (lesson.isEnriched) {
+      return res.status(200).json({
+        success: true,
+        data: lesson,
+      });
+    }
+    const courseTitle = lesson.module.course.title;
+    const moduleTitle = lesson.module.title;
+    const lessonTitle = lesson.title;
+    const lessonBlocks = await generateLessonContent(
+      courseTitle,
+      moduleTitle,
+      lessonTitle,
+    );
+    lesson.content = lessonBlocks;
+    lesson.isEnriched = true;
+    await lesson.save();
+    return res.status(200).json({
+      success: true,
+      data: lesson,
+    });
+  } catch (error) {
+    console.log("Lesson generation error", error);
+    return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 module.exports = {
   createCourseFlow,
   getCourseById,
   getAllCourses,
+  generateLesson,
 };

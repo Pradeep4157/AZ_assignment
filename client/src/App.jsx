@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import CourseView from "./pages/CourseView";
+import LessonView from "./pages/LessonView";
 import { Sparkles } from "lucide-react";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/course/:id" element={<CourseView />} />
+            <Route path="/lesson/:lessonId" element = {<LessonView/>}/>
           </Routes>
         </main>
       </div>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Cpu, Play, CheckCircle } from "lucide-react";
 
 function CourseView() {
+  const navigate = useNavigate();
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,11 +74,12 @@ function CourseView() {
                       <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors truncate">{lesson.title}</span>
                     </div>
                     
-                    <button 
-                      onClick={() => alert(`Connecting to enrichment stream pipeline for context block: ${lesson._id}`)}
+                    <button
+                      onClick={() => navigate(`/lesson/${lesson._id}`)}
                       className="h-7 px-3 rounded bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.15] text-[11px] font-medium transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-[0.97]"
                     >
-                      <Cpu className="h-3 w-3 text-cyan-400" /> Compile Node
+                      <Cpu className="h-3 w-3 text-cyan-400" />
+                      Compile Node
                     </button>
                   </div>
                 ))}

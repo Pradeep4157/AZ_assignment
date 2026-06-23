@@ -109,7 +109,7 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
         temperature: 0.3,
       },
     });
-
+    console.log("RAW LESSON RESPONSE:\n", response.message.content);
     let responseText = response.message.content.trim();
 
     // Remove accidental markdown fences
@@ -118,10 +118,14 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
       .replace(/^```\s*/i, "")
       .replace(/\s*```$/i, "");
 
-    const lessonBlocks = JSON.parse(responseText);
+    const parsedResponse = JSON.parse(responseText);
+
+    const lessonBlocks = Array.isArray(parsedResponse)
+      ? parsedResponse
+      : parsedResponse.content;
 
     if (!Array.isArray(lessonBlocks)) {
-      throw new Error("AI did not return an array");
+      throw new Error("AI did not return a valid content array");
     }
 
     // Basic validation
