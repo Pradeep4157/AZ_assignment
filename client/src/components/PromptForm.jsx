@@ -35,9 +35,9 @@ function PromptForm({ onCourseCreated }) {
   };
 
   return (
-    <form onSubmit={handleGenerate} className="space-y-4">
-      <div className="flex flex-col space-y-2">
-        <label className="text-xs font-mono uppercase tracking-wider text-slate-400">Target Core Knowledge Graph</label>
+    <form onSubmit={handleGenerate} className="space-y-8">
+      <div className="flex flex-col space-y-4">
+        <label className="text-xs  uppercase tracking-wider text-slate-400">Target Core Knowledge Graph</label>
         <div className="flex flex-col sm:flex-row gap-3">
           <input 
             type="text" 
@@ -67,7 +67,7 @@ function PromptForm({ onCourseCreated }) {
         </div>
       </div>
       {statusText && (
-        <p className="text-xs font-mono text-cyan-400 animate-pulse flex items-center gap-2">
+        <p className="text-xs  text-cyan-400 animate-pulse flex items-center gap-2">
           <span>&gt;</span> {statusText}
         </p>
       )}

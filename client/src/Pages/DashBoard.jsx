@@ -60,11 +60,11 @@ function Dashboard() {
     <div className="space-y-16 text-left">
       {/* Hero Header Block */}
       <div className="max-w-3xl space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs ">
           <Terminal className="h-3.5 w-3.5" /> Engine Used: Local Gemma3
         </div>
         
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
             AI-Powered Course Generation.
         </h1>
         
@@ -75,9 +75,9 @@ function Dashboard() {
 
       {/* Control Input Panel Deck */}
       <div className="p-6 rounded-xl bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl relative overflow-hidden group">
-        <form onSubmit={handleGenerate} className="space-y-4">
+        <form onSubmit={handleGenerate} className="space-y-6">
           <div className="flex flex-col space-y-2">
-            <label className="text-xs font-mono uppercase tracking-wider text-slate-400">Enter Course Name</label>
+            <label className="text-xs  uppercase tracking-wider text-slate-400">Enter Course Name</label>
             <div className="flex flex-col sm:flex-row gap-3">
               <input 
                 type="text" 
@@ -107,7 +107,7 @@ function Dashboard() {
             </div>
           </div>
           {statusText && (
-            <p className="text-xs font-mono text-cyan-400 animate-pulse">&gt; {statusText}</p>
+            <p className="text-xs  text-cyan-400 animate-pulse">&gt; {statusText}</p>
           )}
         </form>
       </div>
@@ -149,7 +149,7 @@ function Dashboard() {
                 </div>
                 
                 <div className="mt-6 pt-4 border-t border-white/[0.04] flex items-center justify-between text-[11px]">
-                  <span className="text-slate-500 truncate max-w-[200px] font-mono">Prompt: "{course.prompt}"</span>
+                  <span className="text-slate-500 truncate max-w-[200px] ">Prompt: "{course.prompt}"</span>
                   <Link 
                     to={`/course/${course._id}`} 
                     className="inline-flex items-center gap-1 font-medium text-emerald-400 hover:text-emerald-300 transition-colors"

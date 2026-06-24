@@ -6,7 +6,7 @@ function MCQCard({ question }) {
   const [selected, setSelected] = useState(null);
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.01] backdrop-blur-xl p-6 space-y-5 relative overflow-hidden">
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.01] backdrop-blur-xl p-6 space-y-8 relative overflow-hidden">
       {/* Decorative subtle accent lighting in card */}
       <div className="absolute top-0 right-0 w-[120px] h-[120px] bg-gradient-to-br from-emerald-500/5 to-transparent blur-2xl pointer-events-none" />
       
@@ -55,7 +55,7 @@ function MCQCard({ question }) {
       </div>
       
       {selected && (
-        <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs font-mono">
+        <div className="pt-2 border-t border-white/[0.04] flex items-center justify-between text-xs ">
           <span className="text-slate-500">Evaluation verification completed.</span>
           {selected === question.correct_answer ? (
             <span className="text-emerald-400 font-medium">Status: Correct Answer.</span>

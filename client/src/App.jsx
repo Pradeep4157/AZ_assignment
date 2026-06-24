@@ -7,7 +7,7 @@ import { Sparkles } from "lucide-react";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-[#030712] text-slate-100 font-sans selection:bg-emerald-500/30 relative overflow-x-hidden">
+      <div className="min-h-screen bg-[#030712] text-slate-100  selection:bg-emerald-500/30 relative overflow-x-hidden">
 
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[400px] bg-gradient-to-b from-emerald-500/10 via-cyan-500/5 to-transparent blur-[120px] pointer-events-none" />
         
@@ -27,7 +27,7 @@ function App() {
           </div>
         </header>
         
-        <main className="max-w-7xl mx-auto px-6 py-12 relative z-10">
+        <main className="max-w-6xl mx-auto px-8 py-20 relative z-10">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/course/:id" element={<CourseView />} />

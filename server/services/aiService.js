@@ -77,16 +77,43 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
 
     3. Return an array of content blocks.
 
-    Example:
+    Return ONLY JSON in this exact format:
 
     [
       {
-        "type":"heading",
-        "text":"Lesson Title"
+        "type": "heading",
+        "text": "Lesson title"
       },
+
       {
-        "type":"paragraph",
-        "text":"Explanation..."
+        "type": "paragraph",
+        "text": "Explanation..."
+      },
+
+      {
+        "type": "code",
+        "language": "javascript",
+        "content": "console.log('hello');"
+      },
+
+      {
+        "type": "video",
+        "url": "https://example.com/video",
+        "caption": "Video description"
+      },
+
+      MCQ format MUST be:
+
+      {
+        "type": "mcq",
+        "question": "What is a class in OOP?",
+        "options": [
+          "A blueprint for creating objects",
+          "A database table",
+          "A compiler directive",
+          "A network protocol"
+        ],
+        "correct_answer": "A blueprint for creating objects"
       }
     ]
     `;

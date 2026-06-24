@@ -5,30 +5,53 @@ import { ArrowLeft, Loader2, Video, Terminal, AlertCircle } from "lucide-react";
 import MCQCard from "../components/MCQCard";
 
 function LessonView() {
-  const { lessonId } = useParams();
-  const [lesson, setLesson] = useState(null);
+  const {lessonId} = useParams();
   const [loading, setLoading] = useState(true);
-
+  const [lesson, setLesson] = useState(null);
   useEffect(() => {
-    const generateLesson = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/lessons/${lessonId}/generate`,
-          { method: "POST" }
-        );
-        const result = await response.json();
-        if (result.success) {
-          setLesson(result.data);
+    const generateLesson = async() => {
+      try{
+        const response = await fetch(`http://localhost:5000/api/lessons/${lessonId}/generate`,{
+          method: "POST"
+        });
+        const res = await response.json();
+        if(res.success){
+          setLesson(res.data);
         }
-      } catch (error) {
-        console.error(error);
-      } finally {
+      }catch(error){
+        console.log("Error while fetching course", error);
+      }finally{
         setLoading(false);
       }
-    };
-
+    }
     generateLesson();
-  }, [lessonId]);
+  },[lessonId])
+
+  // const { lessonId } = useParams();
+  // const [lesson, setLesson] = useState(null);
+  // const [loading, setLoading] = useState(true);
+
+  // useEffect(() => {
+  //   const generateLesson = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         `http://localhost:5000/api/lessons/${lessonId}/generate`,
+  //         { method: "POST" }
+  //       );
+  //       const result = await response.json();
+  //       if (result.success) {
+  //         setLesson(result.data);
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   generateLesson();
+  // }, [lessonId]);
+  
 
   if (loading) {
     return (
@@ -36,7 +59,7 @@ function LessonView() {
         <Loader2 className="h-6 w-6 animate-spin text-cyan-400" />
         <div className="space-y-1">
           <p className="text-sm font-medium text-white">Generating micro-lessons</p>
-          <p className="text-xs font-mono text-slate-500">Executing deterministic generation pipeline...</p>
+          <p className="text-xs  text-slate-500">Executing deterministic generation pipeline...</p>
         </div>
       </div>
     );
@@ -59,13 +82,13 @@ function LessonView() {
       <div className="space-y-6">
         <Link
           to={-1}
-          className="inline-flex items-center gap-1.5 text-xs font-mono uppercase tracking-wider text-slate-500 hover:text-white transition-colors group"
+          className="inline-flex items-center gap-1.5 text-xs  uppercase tracking-wider text-slate-500 hover:text-white transition-colors group"
         >
           <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" />
           Back to roadmap
         </Link>
 
-        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white bg-gradient-to-r from-white via-white to-slate-500 bg-clip-text text-transparent">
+        <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-white bg-gradient-to-r from-white via-white to-slate-500 bg-clip-text text-transparent">
           {lesson.title}
         </h1>
       </div>
@@ -98,7 +121,7 @@ function LessonView() {
               return (
                 <div
                   key={index}
-                  className="w-full rounded-xl overflow-hidden border border-white/[0.06] bg-[#090d16] font-mono group"
+                  className="w-full rounded-xl overflow-hidden border border-white/[0.06] bg-[#090d16]  group"
                 >
                   <div className="px-4 py-2 bg-white/[0.02] text-xs text-slate-400 border-b border-white/[0.06] flex items-center justify-between">
                     <span className="flex items-center gap-2 text-slate-400">
@@ -133,7 +156,7 @@ function LessonView() {
                       href={block.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center text-xs font-mono text-cyan-400 hover:text-cyan-300 underline underline-offset-4 mt-2 transition-colors"
+                      className="inline-flex items-center text-xs  text-cyan-400 hover:text-cyan-300 underline underline-offset-4 mt-2 transition-colors"
                     >
                       Open Stream Interface &rarr;
                     </a>
