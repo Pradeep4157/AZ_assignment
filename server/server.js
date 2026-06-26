@@ -1,3 +1,12 @@
+/*
+  Here we will import some libraries like cors for getting request from different port, expresss.json() to allow json request from different port.
+
+  then we mount the api's to the routes.
+
+  then we connect to db and then start listening at the port. 
+
+*/
+
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
