@@ -1,8 +1,26 @@
 /*
+  Here there are several controllers that take some req from client, exec them with the help
+
+  of service layer and return the response 
+
+  1) createCourseFlow : this is used to create the outline of the course that is just the module 
+
+  titles and lesson titles (not the content of the lesson).
+
+  First we get the topic(which is the prompt entered by the user), then we send that topic to service
+  
+  layer which gives makes api call to llm to create the course outline, sends that data in the format 
+
+  that we specify..
+
+  Now we have the outline we insert this data in the db and incase there is no error in this process,
+
+  then we return res.status(201) which is used to denote sucessfull insertion of data.
+
+  2) 
 
 */
 const Course = require("../models/Course");
-const temp;
 const Module = require("../models/Module");
 const Lesson = require("../models/Lesson");
 const {
@@ -24,6 +42,38 @@ const createCourseFlow = async (req, res) => {
     if (!aiOutline || !Array.isArray(aiOutline.modules)) {
       throw new Error("Invalid AI Response format");
     }
+
+    // const course = await Course.create({
+    //   prompt: topic,
+    //   title: aiOutline.title,
+    //   description: aiOutline.description,
+    //   creater: creater,
+    //   modules: [],
+    // });
+    // for (const moduleData of aiCourse.modules) {
+    //   const moduleInstance = await Module.create({
+    //     title: moduleData.title,
+    //     course: course._id,
+    //     lessons: [],
+    //   });
+    //   for (const lessonData of moduleData.lessons) {
+    //     const lessonInstance = await Lesson.create({
+    //       title: lessonData.title,
+    //       content: [],
+    //       isEnriched: false,
+    //       module: moduleInstance._id,
+    //     });
+    //     moduleInstance.lessons.push(lessonInstance._id);
+    //   }
+    //   await moduleInstance.save();
+    //   course.modules.push(moduleInstance._id);
+    // }
+    // await course.save();
+    // return res.status(201).json({
+    //   success: true,
+    //   courseId: course._id,
+    //   message: "created ai outline of the couruse requested",
+    // });
 
     const course = await Course.create({
       prompt: topic,
