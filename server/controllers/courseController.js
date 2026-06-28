@@ -17,7 +17,13 @@
 
   then we return res.status(201) which is used to denote sucessfull insertion of data.
 
-  2) 
+  2) findCourseById : it goess through the course that we get in the req.params and then in the modules key of the Course we do populate and since while designing the schema we 
+
+  had already specified ref as Module mongoose is going to search in the Module for these modules id's in Course schema and then inside Module we have defined Lesson ref in the lessons
+
+  so it will go there and populate the lessons of Module with the actual  content of that.
+
+  
 
 */
 const Course = require("../models/Course");
@@ -119,6 +125,36 @@ const createCourseFlow = async (req, res) => {
   }
 };
 
+// const getCourseById = async (req, res) => {
+//   try {
+//     const id = req.params.id;
+//     const response = await Course.findById(id).populate({
+//       path: "modules",
+//       populate: {
+//         path: "lessons",
+//       },
+//     });
+//     if (!response) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "did not found course with this Id",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       success: true,
+//       message: "we fetched the course from db",
+//       data: response,
+//     });
+//   } catch (error) {
+//     console.log("error while fetching course", error);
+//     return res.status(500).json({
+//       sucess: false,
+//       error: error.message,
+//     });
+//   }
+// };
+
 const getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id).populate({
@@ -142,12 +178,28 @@ const getCourseById = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().sort({ createdAt: -1 }); // Newest first
-    return res.status(200).json({ success: true, data: courses });
+    const courses = await Course.find().sort({ createdAt: -1 });
+    return res.status(200).json({
+      success: true,
+      data: courses,
+    });
   } catch (error) {
-    return res.status(500).json({ success: false, error: error.message });
+    console.log("error occured while fetching the courses", error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+    });
   }
 };
+
+// const getAllCourses = async (req, res) => {
+//   try {
+//     const courses = await Course.find().sort({ createdAt: -1 }); // Newest first
+//     return res.status(200).json({ success: true, data: courses });
+//   } catch (error) {
+//     return res.status(500).json({ success: false, error: error.message });
+//   }
+// };
 // generateLessonContent requires courseTitle, moduleTitle, lessonTitle. we have stored course._id, lesson._id, in the module so we can get it from there and send it here.
 const generateLesson = async (req, res) => {
   try {

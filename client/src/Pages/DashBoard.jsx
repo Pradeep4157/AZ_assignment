@@ -116,7 +116,7 @@ function Dashboard() {
       <div className="space-y-6">
         <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
           <h2 className="text-lg font-medium text-white flex items-center gap-2 m-0">
-            <Layers className="h-4 w-4 text-slate-400" /> Courses Generated
+            <Layers className="h-4 w-4 text-slate-400" /> My Courses 
           </h2>
           
         </div>
