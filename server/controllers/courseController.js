@@ -36,7 +36,8 @@ const {
 
 const createCourseFlow = async (req, res) => {
   try {
-    const { topic, creator } = req.body;
+    const { topic } = req.body;
+    const userId = req.user.userId;
     if (!topic) {
       return res.status(400).json({
         success: false,
@@ -49,43 +50,11 @@ const createCourseFlow = async (req, res) => {
       throw new Error("Invalid AI Response format");
     }
 
-    // const course = await Course.create({
-    //   prompt: topic,
-    //   title: aiOutline.title,
-    //   description: aiOutline.description,
-    //   creater: creater,
-    //   modules: [],
-    // });
-    // for (const moduleData of aiCourse.modules) {
-    //   const moduleInstance = await Module.create({
-    //     title: moduleData.title,
-    //     course: course._id,
-    //     lessons: [],
-    //   });
-    //   for (const lessonData of moduleData.lessons) {
-    //     const lessonInstance = await Lesson.create({
-    //       title: lessonData.title,
-    //       content: [],
-    //       isEnriched: false,
-    //       module: moduleInstance._id,
-    //     });
-    //     moduleInstance.lessons.push(lessonInstance._id);
-    //   }
-    //   await moduleInstance.save();
-    //   course.modules.push(moduleInstance._id);
-    // }
-    // await course.save();
-    // return res.status(201).json({
-    //   success: true,
-    //   courseId: course._id,
-    //   message: "created ai outline of the couruse requested",
-    // });
-
     const course = await Course.create({
       prompt: topic,
       title: aiOutline.title,
       description: aiOutline.description || "",
-      creator: creator,
+      creator: userId,
       modules: [],
     });
 
@@ -124,36 +93,6 @@ const createCourseFlow = async (req, res) => {
     return res.status(500).json({ success: false, error: error.message });
   }
 };
-
-// const getCourseById = async (req, res) => {
-//   try {
-//     const id = req.params.id;
-//     const response = await Course.findById(id).populate({
-//       path: "modules",
-//       populate: {
-//         path: "lessons",
-//       },
-//     });
-//     if (!response) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "did not found course with this Id",
-//       });
-//     }
-
-//     return res.status(200).json({
-//       success: true,
-//       message: "we fetched the course from db",
-//       data: response,
-//     });
-//   } catch (error) {
-//     console.log("error while fetching course", error);
-//     return res.status(500).json({
-//       sucess: false,
-//       error: error.message,
-//     });
-//   }
-// };
 
 const getCourseById = async (req, res) => {
   try {

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const requireAuth = require("../middleware/auth"); // Import our new gatekeeper
 
 // Import the controller functions we built earlier
 const {
@@ -12,8 +13,7 @@ const {
  * @route   POST /api/courses/generate
  * @desc    Generate a new course outline using Ollama and save placeholders to DB
  */
-router.post("/generate", createCourseFlow);
-
+router.post("/generate", requireAuth, courseController.generateCourse);
 /**
  * @route   GET /api/courses/:id
  * @desc    Get a single course with deeply populated modules and lessons
