@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Terminal, Sparkles, Loader2, ArrowRight } from "lucide-react";
+import { useAuth } from "../context/AuthContext"; // 👈 Imported our new auth state hook
 
 function Dashboard() {
+  const { token, isAuthenticated } = useAuth(); // 👈 Destructured auth variables
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -12,11 +14,25 @@ function Dashboard() {
   const [genLoading, setGenLoading] = useState(false);
   const [statusText, setStatusText] = useState("");
 
+  // 1. Fetch User-Scoped courses using the JWT Token
   const fetchCourses = async () => {
+    if (!isAuthenticated || !token) {
+      setCourses([]);
+      setLoading(false);
+      return;
+    }
+    
     try {
-      const response = await fetch("http://localhost:5000/api/courses");
+      setLoading(true);
+      const response = await fetch("http://localhost:5000/api/courses", {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${token}` // 🔑 Securely scopes our request
+        }
+      });
       const result = await response.json();
-      if (result.success) setCourses(result.data);
+      // FIXED: your backend payload variable is named 'courses', not 'data'
+      if (result.success) setCourses(result.courses); 
     } catch (error) {
       console.error("Error fetching dashboard registry:", error);
     } finally {
@@ -24,22 +40,37 @@ function Dashboard() {
     }
   };
 
+  // Re-fetch history whenever authentication state shifts
   useEffect(() => {
     fetchCourses();
-  }, []);
+  }, [isAuthenticated, token]);
 
-  const handleGenerate = async (e) => {
-    e.preventDefault();
-    if (!topic.trim()) return;
+  // 2. Intercept and Resume Check for LocalStorage Cached Inputs
+  useEffect(() => {
+    if (isAuthenticated && token) {
+      const pendingTopic = localStorage.getItem("pending_topic");
+      if (pendingTopic) {
+        localStorage.removeItem("pending_topic"); // Clean up right away
+        setTopic(pendingTopic);
+        // Execute generation seamlessly on their behalf
+        executeGeneration(pendingTopic);
+      }
+    }
+  }, [isAuthenticated, token]);
 
+  // Abstracted Generation Logic
+  const executeGeneration = async (topicToGenerate) => {
     try {
       setGenLoading(true);
       setStatusText("Initializing structural pipelines...");
       
       const response = await fetch("http://localhost:5000/api/courses/generate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ topic, creator: "system_admin" }),
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}` // 🔑 Protect route via bearer scheme
+        },
+        body: JSON.stringify({ topic: topicToGenerate }), // 'creator' is extracted by backend middleware now!
       });
       
       const result = await response.json();
@@ -54,6 +85,22 @@ function Dashboard() {
     } finally {
       setGenLoading(false);
     }
+  };
+
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    const cleanTopic = topic.trim();
+    if (!cleanTopic) return;
+
+    // 🛑 GUEST INTERCEPTION GATEWAY
+    if (!isAuthenticated) {
+      localStorage.setItem("pending_topic", cleanTopic);
+      alert("Please sign in with Google using the button in the top right to generate and save your custom learning path!");
+      return;
+    }
+
+    // Authenticated user path
+    executeGeneration(cleanTopic);
   };
 
   return (
@@ -100,7 +147,7 @@ function Dashboard() {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4 text-emerald-600 fill-emerald-600/20" />
-                    Generate Course
+                    {isAuthenticated ? "Generate Course" : "Sign In to Generate"}
                   </>
                 )}
               </button>
@@ -118,10 +165,14 @@ function Dashboard() {
           <h2 className="text-lg font-medium text-white flex items-center gap-2 m-0">
             <Layers className="h-4 w-4 text-slate-400" /> My Courses 
           </h2>
-          
         </div>
 
-        {loading ? (
+        {!isAuthenticated ? (
+          /* Logged out placeholder interface state */
+          <div className="text-center py-12 rounded-xl border border-dashed border-white/[0.06] bg-white/[0.01]">
+            <p className="text-sm text-slate-500">Sign in to view your personalized generation pipeline history registries.</p>
+          </div>
+        ) : loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="h-32 rounded-xl bg-white/[0.02] border border-white/[0.04] animate-pulse" />
             <div className="h-32 rounded-xl bg-white/[0.02] border border-white/[0.04] animate-pulse" />

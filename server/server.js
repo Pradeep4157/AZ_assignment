@@ -14,6 +14,7 @@ require("dotenv").config(); // Loads environment variables from a .env file
 
 const courseRoutes = require("./routes/courseRoutes");
 const lessonRoutes = require("./routes/lessonRoutes");
+const authRoutes = require("./routes/authRoutes");
 const app = express();
 const PORT = process.env.PORT;
 
@@ -24,6 +25,7 @@ app.use(express.json()); // Allows Express to parse JSON incoming request bodies
 // 2. Mount API Routes
 app.use("/api/courses", courseRoutes);
 app.use("/api/lessons", lessonRoutes);
+app.use("/api/auth", authRoutes);
 
 // 3. MongoDB Connection
 // Replace the fallback string with your actual local or Atlas string if needed

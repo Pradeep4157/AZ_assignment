@@ -145,11 +145,34 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
       .replace(/^```\s*/i, "")
       .replace(/\s*```$/i, "");
 
+    // 1. Parse the cleaned string text into a JSON object/array
     const parsedResponse = JSON.parse(responseText);
 
-    const lessonBlocks = Array.isArray(parsedResponse)
-      ? parsedResponse
-      : parsedResponse.content;
+    // 2. Dynamically extract the array no matter how the LLM formatted the root
+    let lessonBlocks = null;
+
+    if (Array.isArray(parsedResponse)) {
+      // Case A: The LLM followed instructions perfectly and gave a top-level array
+      lessonBlocks = parsedResponse;
+    } else if (parsedResponse && typeof parsedResponse === "object") {
+      // Case B: The LLM wrapped it in an object. Let's find the array!
+
+      // First, check your preferred choice
+      if (Array.isArray(parsedResponse.content)) {
+        lessonBlocks = parsedResponse.content;
+      } else {
+        // Fallback: Loop through keys to find the first one that contains an array
+        const arrayKey = Object.keys(parsedResponse).find((key) =>
+          Array.isArray(parsedResponse[key]),
+        );
+        if (arrayKey) {
+          console.log(
+            `🤖 LLM Quirking: Extracted array from unexpected key: "${arrayKey}"`,
+          );
+          lessonBlocks = parsedResponse[arrayKey];
+        }
+      }
+    }
 
     if (!Array.isArray(lessonBlocks)) {
       throw new Error("AI did not return a valid content array");
