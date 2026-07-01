@@ -172,7 +172,17 @@ const generateLesson = async (req, res) => {
         data: lesson,
       });
     }
+    // 3. 🚨 THE GUARDRAIL: Check if it is currently generating
+    if (lesson.isGenerating) {
+      return res.status(425).json({
+        success: false,
+        message:
+          "Pipeline busy: This lesson is already being compiled by the AI engine. Please wait.",
+      });
+    }
 
+    // 4. LOCK THE DOCUMENT: Immediately set isGenerating to true in the database
+    await Lesson.findByIdAndUpdate(lessonId, { $set: { isGenerating: true } });
     const courseTitle = lesson.module.course.title;
     const moduleTitle = lesson.module.title;
     const lessonTitle = lesson.title;
@@ -183,15 +193,22 @@ const generateLesson = async (req, res) => {
       lessonTitle,
     );
 
-    lesson.content = lessonBlocks;
-    lesson.isEnriched = true;
-    await lesson.save();
+    const updatedLesson = await Lesson.findByIdAndUpdate(
+      lessonId,
+      {
+        $set: {
+          content: lessonBlocks,
+          isEnriched: true,
+          isGenerating: false, // Unlock
+        },
+      },
+      { new: true },
+    );
 
-    return res.status(200).json({
-      success: true,
-      data: lesson,
-    });
+    return res.status(200).json({ success: true, data: updatedLesson });
   } catch (error) {
+    // 🚨 IMPORTANT: If the AI crashes, make sure to unlock the document!
+    await Lesson.findByIdAndUpdate(lessonId, { $set: { isGenerating: false } });
     console.log("Lesson generation error", error);
     return res.status(500).json({ success: false, message: error.message });
   }

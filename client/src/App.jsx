@@ -69,7 +69,7 @@ function NavigationHeader() {
             size="small"
           />
         )}
-        <span className="px-2.5 py-1 rounded-full bg-white/[0.04] border border-white/[0.08]">v1.0.0-beta</span>
+        
       </div>
     </header>
   );

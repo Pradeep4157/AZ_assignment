@@ -3,6 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import { Loader2, ArrowLeft, Video, Terminal, AlertCircle } from "lucide-react";
 import MCQCard from "../components/MCQCard";
 import { useAuth } from "../context/AuthContext";
+import VideoBlock from "../components/VideoBlock";
+import LessonPDFExporter from "../components/LessonPDFExporter";
 
 function LessonView() {
   const { token, isAuthenticated } = useAuth();
@@ -13,10 +15,12 @@ function LessonView() {
   useEffect(() => {
     const generateLesson = async () => {
       if (!isAuthenticated || !token) {
-        setLesson(null); // 💡 FIXED: Keep state as null instead of [] to prevent runtime layout errors
+        setLesson(null);
         setLoading(false);
         return;
       }
+
+      let isBusy = false; // Guard variable to track status inside this execution run
 
       try {
         setLoading(true);
@@ -27,20 +31,33 @@ function LessonView() {
             "Content-Type": "application/json"
           }
         });
+        
         const res = await response.json();
+        
+        if (response.status === 425) {
+          isBusy = true; // Mark as busy so finally block skips turning off loader
+          console.log("🎯 Engine busy. Retrying stream resolution shortly...");
+          setTimeout(generateLesson, 4000); // ✨ FIXED: Recursively call the fetch function, not the whole view!
+          return; 
+        }
+
         if (res.success) {
-          setLesson(res.data); // Matches backend structure perfectly!
+          setLesson(res.data);
         }
       } catch (error) {
         console.error("Error while fetching lesson environment:", error);
       } finally {
-        setLoading(false);
+        // 🚨 Only remove the loader spinner if the engine isn't actively cooking a retry loop!
+        if (!isBusy) {
+          setLoading(false);
+        }
       }
     };
 
     generateLesson();
   }, [isAuthenticated, token, lessonId]);
 
+  
   if (loading) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center space-y-4 text-center w-full">
@@ -71,13 +88,17 @@ function LessonView() {
     <div className="w-full space-y-12 text-left pb-24">
       {/* Navigation & Header */}
       <div className="space-y-6">
-        <Link
-          to={-1}
-          className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-slate-500 hover:text-white transition-colors group"
-        >
-          <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" />
-          Back to roadmap
-        </Link>
+        <div className="flex items-center justify-between w-full"> {/* 👈 Wrapper layout flexbox */}
+          <Link
+            to={-1}
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-slate-500 hover:text-white transition-colors group"
+          >
+            <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" />
+            Back to roadmap
+          </Link>
+
+          <LessonPDFExporter lesson={lesson} /> {/* 👈 Render Exporter Button here! */}
+        </div>
 
         <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-white bg-gradient-to-r from-white via-white to-slate-500 bg-clip-text text-transparent">
           {lesson.title}
@@ -129,18 +150,11 @@ function LessonView() {
 
             case "video":
               return (
-                <div key={index} className="w-full rounded-xl border border-cyan-500/10 bg-cyan-500/[0.02] p-5 backdrop-blur-md flex items-start gap-4">
-                  <div className="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 shrink-0">
-                    <Video className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-1.5 flex-1">
-                    <h3 className="text-sm font-medium text-cyan-400">Recommended Video Resource</h3>
-                    <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{block.caption}</p>
-                    <a href={block.url} target="_blank" rel="noreferrer" className="inline-flex items-center text-xs text-cyan-400 hover:text-cyan-300 underline underline-offset-4 mt-2 transition-colors">
-                      Open Stream Interface &rarr;
-                    </a>
-                  </div>
-                </div>
+                <VideoBlock
+                  key={index}
+                  searchQuery={block.search_query} // Passes the AI query down
+                  caption={block.caption}
+                />
               );
 
             case "mcq":
@@ -151,7 +165,9 @@ function LessonView() {
           }
         })}
       </div>
+      
     </div>
+    
   );
 }
 

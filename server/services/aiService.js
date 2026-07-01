@@ -76,13 +76,16 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
     2. Output ONLY valid JSON.
 
     3. Return an array of content blocks.
+    
+    4. Do NOT repeat the main lesson title as the first heading. 
+    5. Headings should only be used to introduce sub-sections within the lesson content.
 
     Return ONLY JSON in this exact format:
 
     [
       {
         "type": "heading",
-        "text": "Lesson title"
+        "text": "Deep Dive: Core Concepts & Architectural Overview"
       },
 
       {
@@ -98,8 +101,8 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
 
       {
         "type": "video",
-        "url": "https://example.com/video",
-        "caption": "Video description"
+        "search_query": "C++ environment setup compilation guide tutorial",
+        "caption": "Step-by-step visual walk-through of the execution pipeline."
       },
 
       MCQ format MUST be:

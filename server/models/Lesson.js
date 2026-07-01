@@ -5,6 +5,7 @@ const lessonSchema = new mongoose.Schema(
     content: { type: [mongoose.Schema.Types.Mixed], required: true },
     isEnriched: { type: Boolean, default: false },
     module: { type: mongoose.Schema.Types.ObjectId, ref: "Module" },
+    isGenerating: { type: Boolean, default: false },
   },
   { timestamps: true },
 );
