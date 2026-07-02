@@ -10,7 +10,10 @@ function VideoBlock({ searchQuery, caption }) {
 
   useEffect(() => {
     const fetchYouTubeVideo = async () => {
+      console.log("Auth state in VideoBlock:", { isAuthenticated, token, searchQuery });
       if (!isAuthenticated || !token || !searchQuery) return;
+      
+
 
       try {
         setLoading(true);

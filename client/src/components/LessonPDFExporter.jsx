@@ -1,8 +1,7 @@
 import { useRef, useState } from "react";
-import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import { Download, Loader2 } from "lucide-react";
-
+import html2canvas from "html2canvas";
 function LessonPDFExporter({ lesson }) {
   const [exporting, setExporting] = useState(false);
   const printRef = useRef(null);
@@ -14,8 +13,7 @@ function LessonPDFExporter({ lesson }) {
       setExporting(true);
 
       const element = printRef.current;
-
-      // 💡 Use an ultra-high performance canvas snapshot configuration
+      
       const canvas = await html2canvas(element, {
         scale: 2, 
         useCORS: true, 
@@ -24,29 +22,40 @@ function LessonPDFExporter({ lesson }) {
       });
 
       const imgData = canvas.toDataURL("image/jpeg", 1.0);
-      
       const pdf = new jsPDF("p", "mm", "a4");
+      
       const imgWidth = 210; 
-      const pageHeight = 297;  
-      
-      // Safeguard against division by zero errors
-      const canvasWidth = canvas.width > 0 ? canvas.width : 1;
-      const canvasHeight = canvas.height > 0 ? canvas.height : 1;
-      
-      const imgHeight = Math.floor((canvasHeight * imgWidth) / canvasWidth);
-      let heightLeft = imgHeight;
-      let position = 0;
+      const pageHeightMm = 297; 
+      const printableHeightMm = 290; // 💡 Your custom threshold before masking out text cuts
+      const maskHeightMm = pageHeightMm - printableHeightMm; // 17mm safety mask block
 
-      // Print Page 1
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
-      heightLeft -= pageHeight;
+      const imgHeightMm = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeightMm;
+      let position = 0; // Tracks our current drawing position
 
-      // Print subsequent pages cleanly
+      // --- PAGE 1 RENDERING ---
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeightMm, undefined, 'FAST');
+      heightLeft -= printableHeightMm;
+
+      // Apply the white safety mask to the bottom of Page 1 if more content remains
+      if (heightLeft > 0) {
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(0, printableHeightMm, imgWidth, maskHeightMm, "F");
+      }
+
+      // --- SUBSEQUENT PAGES LOOP ---
       while (heightLeft > 0) {
-        position -= pageHeight;
+        position -= printableHeightMm; // 💡 Shift the image up exactly by our printable height unit
         pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight, undefined, 'FAST');
-        heightLeft -= pageHeight;
+        
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeightMm, undefined, 'FAST');
+        heightLeft -= printableHeightMm;
+
+        // Apply white safety mask to the bottom of the current page if more content remains
+        if (heightLeft > 0) {
+          pdf.setFillColor(255, 255, 255);
+          pdf.rect(0, printableHeightMm, imgWidth, maskHeightMm, "F");
+        }
       }
 
       const filename = `${lesson.title.toLowerCase().replace(/[^a-z0-9]/g, "_")}_lesson.pdf`;
@@ -58,7 +67,6 @@ function LessonPDFExporter({ lesson }) {
       setExporting(false);
     }
   };
-
   return (
     <>
       <button
@@ -69,7 +77,7 @@ function LessonPDFExporter({ lesson }) {
         {exporting ? (
           <>
             <Loader2 className="h-3.5 w-3.5 animate-spin text-cyan-400" />
-            Compiling document stream...
+            Compiling native document stream...
           </>
         ) : (
           <>
@@ -79,21 +87,20 @@ function LessonPDFExporter({ lesson }) {
         )}
       </button>
 
-      {/* 💡 THE FIX: Render completely off-screen instead of display: none */}
+      {/* Hidden high-contrast white layout explicitly optimized for native HTML compilation */}
       <div style={{ position: "absolute", left: "-9999px", top: "0", zIndex: "-100" }}>
         <div
           ref={printRef}
           style={{
-            width: "800px",
-            padding: "40px",
+            width: "750px", // Coordinates directly with windowWidth parameter above
+            padding: "20px",
             color: "#1e293b",
             fontFamily: "system-ui, -apple-system, sans-serif",
             backgroundColor: "#ffffff",
           }}
-          className="space-y-8"
         >
-          {/* Header */}
-          <div style={{ borderBottom: "2px solid #e2e8f0", paddingBottom: "12px" }}>
+          {/* Header Block - Avoid breaking directly after header title */}
+          <div style={{ borderBottom: "2px solid #e2e8f0", paddingBottom: "12px", marginBottom: "24px", pageBreakInside: "avoid" }}>
             <span style={{ fontSize: "12px", textTransform: "uppercase", color: "#64748b", tracking: "wider", fontWeight: "600" }}>
               Structured Learning Pipeline
             </span>
@@ -107,19 +114,28 @@ function LessonPDFExporter({ lesson }) {
             switch (block.type) {
               case "heading":
                 return (
-                  <h2 key={idx} style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a", paddingTop: "10px", borderBottom: "1px solid #f1f5f9", paddingBottom: "6px" }}>
+                  <h2 
+                    key={idx} 
+                    style={{ fontSize: "20px", fontWeight: "600", color: "#0f172a", paddingTop: "14px", borderBottom: "1px solid #f1f5f9", paddingBottom: "6px", marginBottom: "16px", pageBreakInside: "avoid" }}
+                  >
                     {block.text}
                   </h2>
                 );
               case "paragraph":
                 return (
-                  <p key={idx} style={{ fontSize: "14px", lineHeight: "1.6", color: "#334155" }}>
+                  <p 
+                    key={idx} 
+                    style={{ fontSize: "14px", lineHeight: "1.6", color: "#334155", marginBottom: "16px" }}
+                  >
                     {block.text}
                   </p>
                 );
               case "code":
                 return (
-                  <div key={idx} style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px", fontFamily: "monospace", fontSize: "12px" }}>
+                  <div 
+                    key={idx} 
+                    style={{ backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px", fontFamily: "monospace", fontSize: "12px", marginBottom: "16px", pageBreakInside: "avoid" }}
+                  >
                     <div style={{ color: "#64748b", borderBottom: "1px solid #e2e8f0", paddingBottom: "4px", marginBottom: "8px" }}>
                       Source Execution Block ({block.language})
                     </div>
@@ -128,7 +144,10 @@ function LessonPDFExporter({ lesson }) {
                 );
               case "mcq":
                 return (
-                  <div key={idx} style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px", backgroundColor: "#f8fafc" }}>
+                  <div 
+                    key={idx} 
+                    style={{ border: "1px solid #e2e8f0", borderRadius: "8px", padding: "16px", backgroundColor: "#f8fafc", marginBottom: "16px", pageBreakInside: "avoid" }}
+                  >
                     <p style={{ fontSize: "14px", fontWeight: "600", color: "#0f172a" }}>Q: {block.question}</p>
                     <ul style={{ listStyleType: "none", paddingLeft: 0, marginTop: "8px" }}>
                       {block.options?.map((opt, oIdx) => (

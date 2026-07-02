@@ -97,7 +97,7 @@ function LessonView() {
             Back to roadmap
           </Link>
 
-          <LessonPDFExporter lesson={lesson} /> {/* 👈 Render Exporter Button here! */}
+          <LessonPDFExporter lesson={lesson} /> {/* Lesson Download Option */}
         </div>
 
         <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-white bg-gradient-to-r from-white via-white to-slate-500 bg-clip-text text-transparent">
