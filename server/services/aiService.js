@@ -1,5 +1,8 @@
-const ollama = require("ollama").default;
+const { GoogleGenAI } = require("@google/genai");
 
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 async function generateCourse(topic) {
   try {
     const prompt = `
@@ -22,33 +25,34 @@ async function generateCourse(topic) {
       ]
     }`;
 
-    const response = await ollama.chat({
-      model: "gemma3:4b",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert syllabus compiler. You must respond ONLY with a raw JSON object matching the requested template format. Do not use markdown backticks, conversational chat text, or introductory notes.",
-        },
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: [
         {
           role: "user",
-          content: prompt,
+          parts: [
+            {
+              text:
+                "You are an expert syllabus compiler. You must respond ONLY with a raw JSON object matching the requested template format. Do not use markdown backticks, conversational chat text, or introductory notes.\n\n" +
+                prompt,
+            },
+          ],
         },
       ],
-      format: "json",
-      options: {
+      config: {
         temperature: 0.6,
+        responseMimeType: "application/json",
       },
     });
 
-    const outlineData = JSON.parse(response.message.content);
+    const outlineData = JSON.parse(response.text);
     console.log(
       " nigga we completed generateCourse and this is the outline data : ",
       outlineData,
     );
     return outlineData;
   } catch (error) {
-    console.error("Ollama Outline Compilation Error:", error);
+    console.error("Gemini Outline Compilation Error:", error);
     throw new Error("Failed to generate course blueprint layout locally.");
   }
 }
@@ -121,27 +125,29 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
     ]
     `;
 
-    const response = await ollama.chat({
-      model: "gemma3:4b",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You are an expert curriculum developer. Respond ONLY with a valid JSON array. No markdown. No explanations.",
-        },
+    const response = await ai.models.generateContent({
+      model: "gemini-3.1-flash-lite",
+      contents: [
         {
           role: "user",
-          content: prompt,
+          parts: [
+            {
+              text:
+                "You are an expert curriculum developer. Respond ONLY with a valid JSON array. No markdown. No explanations.\n\n" +
+                prompt,
+            },
+          ],
         },
       ],
-      format: "json",
-      options: {
+      config: {
         temperature: 0.3,
+        responseMimeType: "application/json",
       },
     });
-    console.log("RAW LESSON RESPONSE:\n", response.message.content);
-    let responseText = response.message.content.trim();
 
+    console.log("RAW LESSON RESPONSE:\n", response.text);
+
+    let responseText = response.text.trim();
     // Remove accidental markdown fences
     responseText = responseText
       .replace(/^```json\s*/i, "")
@@ -204,7 +210,7 @@ async function generateLessonContent(courseTitle, moduleTitle, lessonTitle) {
 
     return lessonBlocks;
   } catch (error) {
-    console.error("Ollama Lesson Generation Error:", error);
+    console.error("Gemini Lesson Generation Error:", error);
 
     throw new Error("Failed to generate lesson content.");
   }

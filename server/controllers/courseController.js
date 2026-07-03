@@ -139,9 +139,8 @@ const getUserCourses = async (req, res) => {
   }
 };
 const generateLesson = async (req, res) => {
-  console.log("we are reaching here...");
+  const { lessonId } = req.params;
   try {
-    const { lessonId } = req.params;
     const userId = req.user.userId; // 🔑 Securely pulled from the JWT middleware
 
     const lesson = await Lesson.findById(lessonId).populate({

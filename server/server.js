@@ -22,7 +22,23 @@ const app = express();
 const PORT = process.env.PORT;
 
 // 1. Global Middleware
-app.use(cors()); // Fixes the CORS cross-port security blocks
+const allowedOrigins = ["http://localhost:5173", process.env.CLIENT_URL];
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      // Allow Postman/curl
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  }),
+);
 app.use(express.json()); // Allows Express to parse JSON incoming request bodies
 
 // 2. Mount API Routes
@@ -34,7 +50,7 @@ app.use("/api/youtube", youtubeRoutes);
 // 3. MongoDB Connection
 // Replace the fallback string with your actual local or Atlas string if needed
 const MONGO_URI = process.env.MONGO_URI;
-// console.log("MONGO_URI =", process.env.MONGO_URI);
+
 mongoose
   .connect(MONGO_URI)
   .then(() => {
@@ -45,7 +61,7 @@ mongoose
 
     // 4. Start listening for network traffic ONLY after DB is ready
     app.listen(PORT, () => {
-      console.log(`📡 Server actively listening on: http://localhost:${PORT}`);
+      console.log(`📡 Server actively listening on:${PORT}`);
     });
   })
   .catch((error) => {
