@@ -2,39 +2,39 @@ import { useEffect, useState } from "react";
 import { Loader2, Video, AlertCircle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-function VideoBlock({ searchQuery, caption }) {
+function VideoBlock({ searchQuery, caption, lessonId }) {
+  console.log("THIS IS THE LESSONiD :  ", lessonId);
   const { token, isAuthenticated } = useAuth();
   const [videoId, setVideoId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    console.log("Auth state in VideoBlock:", { isAuthenticated, token, searchQuery });
+    if (!isAuthenticated || !token || !searchQuery) return;
+    
     const fetchYouTubeVideo = async () => {
-      console.log("Auth state in VideoBlock:", { isAuthenticated, token, searchQuery });
-      if (!isAuthenticated || !token || !searchQuery) return;
-      
-
-
       try {
         setLoading(true);
-        setError(false);
         
-        // Hit our newly protected proxy route!
-        const response = await fetch(`http://localhost:5000/api/youtube/search?query=${encodeURIComponent(searchQuery)}`, {
-          method: "GET",
+        // 🔑 Append both query AND lessonId to your backend API call
+        // Inside your VideoBlock.jsx useEffect, change the URL to:
+        const url = `http://localhost:5000/api/youtube/search?query=${encodeURIComponent(searchQuery)}&lessonId=${lessonId}`;
+        
+        const response = await fetch(url, {
           headers: {
-            "Authorization": `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`, 
+          },
         });
-
-        const data = await response.json();
-        if (data.success && data.videoId) {
-          setVideoId(data.videoId);
+        const result = await response.json();
+        
+        if (result.success && result.videoId) {
+          setVideoId(result.videoId);
         } else {
           setError(true);
         }
       } catch (err) {
-        console.error("Failed to fetch streaming pipeline resource:", err);
+        console.error("Error fetching video:", err);
         setError(true);
       } finally {
         setLoading(false);
@@ -42,7 +42,7 @@ function VideoBlock({ searchQuery, caption }) {
     };
 
     fetchYouTubeVideo();
-  }, [searchQuery, token, isAuthenticated]);
+  }, [isAuthenticated, token, searchQuery, lessonId]); // Added lessonId as a dependency
 
   if (loading) {
     return (

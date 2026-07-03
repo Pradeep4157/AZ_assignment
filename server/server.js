@@ -11,7 +11,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config(); // Loads environment variables from a .env file
-
+require("./models/Course");
+require("./models/Module");
+require("./models/Lesson");
 const courseRoutes = require("./routes/courseRoutes");
 const lessonRoutes = require("./routes/lessonRoutes");
 const authRoutes = require("./routes/authRoutes");

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, Cpu, Play, CheckCircle } from "lucide-react";
-let temp;
+import { ArrowLeft, Cpu } from "lucide-react";
+
 
 function CourseView() {
   const navigate = useNavigate();

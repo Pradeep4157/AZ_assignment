@@ -14,14 +14,14 @@ const {
  * @desc    Generate a new course outline and save placeholders to DB
  * @access  Private (Requires Token)
  */
-router.post("/generate", requireAuth, createCourseFlow); // 👈 Fixed controller name alignment
+router.post("/generate", requireAuth, createCourseFlow);
 
 /**
  * @route   GET /api/courses
  * @desc    Get a list of all courses belonging to the logged-in user
  * @access  Private (Requires Token)
  */
-router.get("/", requireAuth, getUserCourses); // 👈 Added requireAuth here!
+router.get("/", requireAuth, getUserCourses);
 
 /**
  * @route   GET /api/courses/:id

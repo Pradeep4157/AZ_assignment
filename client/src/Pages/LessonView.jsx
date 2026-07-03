@@ -152,7 +152,8 @@ function LessonView() {
               return (
                 <VideoBlock
                   key={index}
-                  searchQuery={block.search_query} // Passes the AI query down
+                  lessonId={lesson._id} // 🔑 Pass the parent lesson ID down
+                  searchQuery={block.search_query} 
                   caption={block.caption}
                 />
               );
