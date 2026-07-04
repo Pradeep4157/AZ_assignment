@@ -24,7 +24,7 @@ function Dashboard() {
     
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/courses", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}` // 🔑 Securely scopes our request
@@ -64,7 +64,7 @@ function Dashboard() {
       setGenLoading(true);
       setStatusText("Initializing structural pipelines...");
       
-      const response = await fetch("http://localhost:5000/api/courses/generate", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/generate`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -108,7 +108,7 @@ function Dashboard() {
       {/* Hero Header Block */}
       <div className="max-w-3xl space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs ">
-          <Terminal className="h-3.5 w-3.5" /> Engine Used: Local Gemma3
+          <Terminal className="h-3.5 w-3.5" /> Engine Used: Gemini 3.5
         </div>
         
         <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-white bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">

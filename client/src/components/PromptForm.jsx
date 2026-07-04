@@ -14,7 +14,7 @@ function PromptForm({ onCourseCreated }) {
       setLoading(true);
       setStatusText("Initializing structural pipelines...");
       
-      const response = await fetch("http://localhost:5000/api/courses/generate", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/courses/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topic, creator: "system_admin" }),

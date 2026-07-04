@@ -19,7 +19,7 @@ function VideoBlock({ searchQuery, caption, lessonId }) {
         
         // 🔑 Append both query AND lessonId to your backend API call
         // Inside your VideoBlock.jsx useEffect, change the URL to:
-        const url = `http://localhost:5000/api/youtube/search?query=${encodeURIComponent(searchQuery)}&lessonId=${lessonId}`;
+        const url = `${import.meta.env.VITE_API_URL}/api/youtube/search?query=${encodeURIComponent(searchQuery)}&lessonId=${lessonId}`;
         
         const response = await fetch(url, {
           headers: {

@@ -12,7 +12,7 @@ function NavigationHeader() {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       // Send the Google token to our Express backend
-      const res = await fetch("http://localhost:5000/api/auth/google", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken: credentialResponse.credential }),
