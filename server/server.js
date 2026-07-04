@@ -41,6 +41,8 @@ app.use(
 );
 app.use(express.json()); // Allows Express to parse JSON incoming request bodies
 
+app.get("/api/health", (req, res) => res.status(200).send("Alive"));
+
 // 2. Mount API Routes
 app.use("/api/courses", courseRoutes);
 app.use("/api/lessons", lessonRoutes);
