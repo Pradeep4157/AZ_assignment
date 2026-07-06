@@ -9,6 +9,65 @@ function CourseView() {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const markCompleted = async (lessonId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/complete`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        setCourse((prev) => ({
+          ...prev,
+          modules: prev.modules.map((module) => ({
+            ...module,
+            lessons: module.lessons.map((lesson) =>
+              lesson._id === lessonId
+                ? { ...lesson, completed: true }
+                : lesson
+            ),
+          })),
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  const markIncomplete = async (lessonId) => {
+      try {
+          const response = await fetch(
+              `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/incomplete`,
+              {
+                  method: "PATCH",
+              }
+          );
+
+          const result = await response.json();
+
+          if (result.success) {
+              setCourse(prev => ({
+                  ...prev,
+                  modules: prev.modules.map(module => ({
+                      ...module,
+                      lessons: module.lessons.map(lesson =>
+                          lesson._id === lessonId
+                              ? {
+                                    ...lesson,
+                                    completed: false,
+                                }
+                              : lesson
+                      ),
+                  })),
+              }));
+          }
+      } catch (err) {
+          console.error(err);
+      }
+  };
 
   useEffect(() => {
     const fetchCourseDetails = async () => {
@@ -27,7 +86,21 @@ function CourseView() {
 
   if (loading) return <div className="text-sm  text-slate-500 animate-pulse">&gt; Pulling dynamic node layout trees...</div>;
   if (!course) return <div className="text-sm text-rose-400">Schema instantiation trace missing. <Link to="/" className="underline">Abort</Link></div>;
+  const totalLessons = course.modules.reduce(
+    (sum, mod) => sum + mod.lessons.length,
+    0
+  );
 
+  const completedLessons = course.modules.reduce(
+    (sum, mod) =>
+      sum + mod.lessons.filter((lesson) => lesson.completed).length,
+    0
+  );
+
+  const progress =
+    totalLessons === 0
+      ? 0
+      : Math.round((completedLessons / totalLessons) * 100);
   return (
     <div className="space-y-10">
       <Link to="/" className="inline-flex items-center gap-2 text-xs font-medium text-slate-400 hover:text-white transition-colors group">
@@ -38,6 +111,23 @@ function CourseView() {
       <div className="border-b border-white/[0.06] pb-8 space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight text-white">{course.title}</h1>
         <p className="text-sm text-slate-400 max-w-3xl leading-relaxed">{course.description}</p>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between text-xs text-slate-400">
+          <span>Course Progress</span>
+          <span>{completedLessons} / {totalLessons} Lessons</span>
+        </div>
+
+        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-emerald-500 transition-all duration-500"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="text-right text-xs text-emerald-400">
+          {progress}% Complete
+        </div>
       </div>
 
       {/* Modules/Lessons Tree Section */}
@@ -75,13 +165,36 @@ function CourseView() {
                       <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors truncate">{lesson.title}</span>
                     </div>
                     
-                    <button
-                      onClick={() => navigate(`/lesson/${lesson._id}`)}
-                      className="h-7 px-3 rounded bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:text-white hover:bg-white/[0.08] hover:border-white/[0.15] text-[11px] font-medium transition-all flex items-center gap-1.5 whitespace-nowrap active:scale-[0.97]"
-                    >
-                      <Cpu className="h-3 w-3 text-cyan-400" />
-                      Compile Node
-                    </button>
+                    <div className="flex items-center gap-3 shrink-0">
+                        <button
+                            onClick={() => navigate(`/lesson/${lesson._id}`)}
+                            className="h-8 px-4 rounded bg-white/[0.04] border border-white/[0.08]
+                                      text-slate-300 hover:text-white hover:bg-white/[0.08]
+                                      hover:border-white/[0.15] text-[11px] font-medium
+                                      transition-all flex items-center gap-1.5
+                                      whitespace-nowrap active:scale-[0.97]"
+                        >
+                            <Cpu className="h-3 w-3 text-cyan-400" />
+                            Compile Node
+                        </button>
+
+                        <button
+                            onClick={() =>
+                                lesson.completed
+                                    ? markIncomplete(lesson._id)
+                                    : markCompleted(lesson._id)
+                            }
+                            className={`h-8 min-w-[140px] px-4 rounded
+                                        text-[11px] font-medium transition-all
+                                        ${
+                                            lesson.completed
+                                                ? "bg-emerald-500 hover:bg-emerald-600 text-white"
+                                                : "bg-white/[0.04] border border-white/[0.08] text-slate-300 hover:bg-emerald-500 hover:text-white"
+                                        }`}
+                        >
+                            {lesson.completed ? "Completed ✓" : "Mark Complete"}
+                        </button>
+                    </div>
                   </div>
                 ))}
               </div>
