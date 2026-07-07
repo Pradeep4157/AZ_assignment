@@ -141,21 +141,51 @@ function CourseView() {
         <h1 className="text-3xl font-semibold tracking-tight text-white">{course.title}</h1>
         <p className="text-sm text-slate-400 max-w-3xl leading-relaxed">{course.description}</p>
       </div>
-      <div className="space-y-2">
-        <div className="flex justify-between text-xs text-slate-400">
-          <span>Course Progress</span>
-          <span>{completedLessons} / {totalLessons} Lessons</span>
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-slate-500">
+              Training Progress
+            </p>
+
+            <h3 className="mt-2 text-3xl font-semibold text-white">
+              {progress}%
+            </h3>
+          </div>
+
+          <div className="text-right">
+            <div className="text-sm font-medium text-emerald-400">
+              {completedLessons} Nodes Compiled
+            </div>
+
+            <div className="mt-1 text-xs text-slate-500">
+              {totalLessons - completedLessons} Remaining
+            </div>
+          </div>
         </div>
 
-        <div className="h-2 bg-white/10 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-emerald-500 transition-all duration-500"
-            style={{ width: `${progress}%` }}
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+          <motion.div
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{
+              duration: 0.8,
+              ease: "easeOut",
+            }}
+            className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-emerald-400 to-green-500"
           />
         </div>
 
-        <div className="text-right text-xs text-emerald-400">
-          {progress}% Complete
+        <div className="mt-4 flex items-center justify-between text-[11px] text-slate-500">
+          <span>
+            {completedLessons} / {totalLessons} Lessons
+          </span>
+
+          <span className="text-emerald-400">
+            {progress === 100
+              ? "Course Complete"
+              : "Learning In Progress"}
+          </span>
         </div>
       </div>
 
