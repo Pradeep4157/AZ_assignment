@@ -10,6 +10,19 @@ function CourseView() {
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
   const markCompleted = async (lessonId) => {
+  // Save UI immediately
+    setCourse((prev) => ({
+      ...prev,
+      modules: prev.modules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) =>
+          lesson._id === lessonId
+            ? { ...lesson, completed: true }
+            : lesson
+        ),
+      })),
+    }));
+
     try {
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/complete`,
@@ -20,53 +33,69 @@ function CourseView() {
 
       const result = await response.json();
 
-      if (result.success) {
-        setCourse((prev) => ({
-          ...prev,
-          modules: prev.modules.map((module) => ({
-            ...module,
-            lessons: module.lessons.map((lesson) =>
-              lesson._id === lessonId
-                ? { ...lesson, completed: true }
-                : lesson
-            ),
-          })),
-        }));
+      if (!result.success) {
+        throw new Error("Failed to update lesson");
       }
     } catch (err) {
       console.error(err);
+
+      // Revert UI if request failed
+      setCourse((prev) => ({
+        ...prev,
+        modules: prev.modules.map((module) => ({
+          ...module,
+          lessons: module.lessons.map((lesson) =>
+            lesson._id === lessonId
+              ? { ...lesson, completed: false }
+              : lesson
+          ),
+        })),
+      }));
     }
   };
   const markIncomplete = async (lessonId) => {
-      try {
-          const response = await fetch(
-              `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/incomplete`,
-              {
-                  method: "PATCH",
-              }
-          );
+    // Update immediately
+    setCourse((prev) => ({
+      ...prev,
+      modules: prev.modules.map((module) => ({
+        ...module,
+        lessons: module.lessons.map((lesson) =>
+          lesson._id === lessonId
+            ? { ...lesson, completed: false }
+            : lesson
+        ),
+      })),
+    }));
 
-          const result = await response.json();
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/incomplete`,
+        {
+          method: "PATCH",
+        }
+      );
 
-          if (result.success) {
-              setCourse(prev => ({
-                  ...prev,
-                  modules: prev.modules.map(module => ({
-                      ...module,
-                      lessons: module.lessons.map(lesson =>
-                          lesson._id === lessonId
-                              ? {
-                                    ...lesson,
-                                    completed: false,
-                                }
-                              : lesson
-                      ),
-                  })),
-              }));
-          }
-      } catch (err) {
-          console.error(err);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error("Failed to update lesson");
       }
+    } catch (err) {
+      console.error(err);
+
+      // Revert if backend failed
+      setCourse((prev) => ({
+        ...prev,
+        modules: prev.modules.map((module) => ({
+          ...module,
+          lessons: module.lessons.map((lesson) =>
+            lesson._id === lessonId
+              ? { ...lesson, completed: true }
+              : lesson
+          ),
+        })),
+      }));
+    }
   };
 
   useEffect(() => {
