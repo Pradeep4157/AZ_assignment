@@ -114,7 +114,9 @@ function Dashboard() {
           onClose={() => setShowLoginModal(false)}
       >
           <div className="flex justify-center">
-              <GoogleSignInButton />
+              <GoogleSignInButton
+                  onSuccess={() => setShowLoginModal(false)}
+              />
           </div>
       </LoginRequiredModal>
       
