@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"; // 👈 Imported
-import { AuthProvider, useAuth } from "./context/AuthContext"; // 👈 Imported
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google"; 
+import { AuthProvider, useAuth } from "./context/AuthContext"; 
 import Dashboard from "./pages/Dashboard";
 import CourseView from "./pages/CourseView";
 import LessonView from "./pages/LessonView";
-import { Sparkles, LogOut } from "lucide-react"; // 👈 Added LogOut icon
+import { Sparkles, LogOut } from "lucide-react"; 
+import GoogleSignInButton from "./components/GoogleSignInButton";
 
 function NavigationHeader() {
   const { user, isAuthenticated, login, logout } = useAuth();
@@ -61,13 +62,7 @@ function NavigationHeader() {
           </div>
         ) : (
           /* Sleek implicit design handler from the Google layout */
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={() => console.error("Google Login Failed")}
-            theme="filled_dark"
-            shape="pill"
-            size="small"
-          />
+          <GoogleSignInButton />
         )}
         
       </div>

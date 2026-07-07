@@ -3,11 +3,14 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BookOpen, Layers, Terminal, Sparkles, Loader2, ArrowRight } from "lucide-react";
 import { useAuth } from "../context/AuthContext"; // 👈 Imported our new auth state hook
+import LoginRequiredModal from "../components/LoginRequiredModal";
+import GoogleSignInButton from "../components/GoogleSignInButton";
 
 function Dashboard() {
   const { token, isAuthenticated } = useAuth(); // 👈 Destructured auth variables
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showLoginModal, setShowLoginModal] = useState(false);  
   
   // Prompt State
   const [topic, setTopic] = useState("");
@@ -95,7 +98,7 @@ function Dashboard() {
     // 🛑 GUEST INTERCEPTION GATEWAY
     if (!isAuthenticated) {
       localStorage.setItem("pending_topic", cleanTopic);
-      alert("Please sign in with Google using the button in the top right to generate and save your custom learning path!");
+      setShowLoginModal(true);
       return;
     }
 
@@ -104,7 +107,17 @@ function Dashboard() {
   };
 
   return (
+    
     <div className="space-y-16 text-left">
+      <LoginRequiredModal
+          open={showLoginModal}
+          onClose={() => setShowLoginModal(false)}
+      >
+          <div className="flex justify-center">
+              <GoogleSignInButton />
+          </div>
+      </LoginRequiredModal>
+      
       {/* Hero Header Block */}
       <div className="max-w-3xl space-y-4">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs ">
