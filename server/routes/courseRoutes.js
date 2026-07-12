@@ -6,7 +6,8 @@ const requireAuth = require("../middleware/auth"); // Our security gatekeeper
 const {
   createCourseFlow,
   getCourseById,
-  getUserCourses, // 👈 Renamed from getAllCourses to reflect the user-scoping
+  getUserCourses,
+  deleteCourse,
 } = require("../controllers/courseController");
 
 /**
@@ -22,6 +23,7 @@ router.post("/generate", requireAuth, createCourseFlow);
  * @access  Private (Requires Token)
  */
 router.get("/", requireAuth, getUserCourses);
+router.delete("/:id", requireAuth, deleteCourse);
 
 /**
  * @route   GET /api/courses/:id

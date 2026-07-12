@@ -26,6 +26,12 @@ Rules:
   - mcq.options
   - mcq.correct_answer
 
+IMPORTANT FOR MCQs:
+1. Translate all options.
+2. Identify which option was originally correct.
+3. Set "correct_answer" to the translated version of that exact option.
+4. After translation, "correct_answer" must exactly match one of the strings in the translated "options" array.
+
 Return ONLY valid JSON.
 
 Lesson JSON:

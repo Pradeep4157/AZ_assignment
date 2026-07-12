@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { BookOpen, Layers, Terminal, Sparkles, Loader2, ArrowRight } from "lucide-react";
+import { BookOpen, Layers, Terminal, Sparkles, Loader2, ArrowRight, Trash2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext"; // 👈 Imported our new auth state hook
 import LoginRequiredModal from "../components/LoginRequiredModal";
+import ConfirmModal from "../components/ConfirmModal";
 import GoogleSignInButton from "../components/GoogleSignInButton";
 
 function Dashboard() {
@@ -11,13 +12,44 @@ function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showLoginModal, setShowLoginModal] = useState(false);  
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState(null);
   
   // Prompt State
   const [topic, setTopic] = useState("");
   const [genLoading, setGenLoading] = useState(false);
   const [statusText, setStatusText] = useState("");
 
-  // 1. Fetch User-Scoped courses using the JWT Token
+  const deleteCourse = async (courseId) => {
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/courses/${courseId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const res = await response.json();
+
+      if (res.success) {
+        setCourses((prev) =>
+          prev.filter((course) => course._id !== courseId)
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    finally {
+        setShowDeleteModal(false);
+        setCourseToDelete(null);
+    }
+  };
+  
+  // Fetch User-Scoped courses using the JWT Token
   const fetchCourses = async () => {
     if (!isAuthenticated || !token) {
       setCourses([]);
@@ -119,6 +151,18 @@ function Dashboard() {
               />
           </div>
       </LoginRequiredModal>
+      <ConfirmModal
+        open={showDeleteModal}
+        title="Delete Course?"
+        description="This will permanently delete the course, all modules, lessons and generated translations. This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        onClose={() => {
+          setShowDeleteModal(false);
+          setCourseToDelete(null);
+        }}
+        onConfirm={() => deleteCourse(courseToDelete)}
+      />
       
       {/* Hero Header Block */}
       <div className="max-w-3xl space-y-4">
@@ -207,9 +251,17 @@ function Dashboard() {
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <h3 className="font-semibold text-sm text-slate-200 group-hover:text-white transition-colors m-0 text-left">{course.title}</h3>
-                    <div className="p-1.5 rounded-md bg-white/[0.04] text-slate-400 group-hover:text-emerald-400 transition-colors">
-                      <BookOpen className="h-3.5 w-3.5" />
-                    </div>
+                    <button
+                      onClick={() => {
+                          setCourseToDelete(course._id);
+                          setShowDeleteModal(true);
+                      }}
+                      className="h-8 w-8 rounded-lg bg-red-500/10 border border-red-500/20
+                                text-red-400 hover:bg-red-500 hover:text-white transition-all
+                                flex items-center justify-center cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
                   </div>
                   <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed text-left m-0">{course.description}</p>
                 </div>

@@ -217,11 +217,11 @@ function CourseView() {
                     key={lesson._id}
                     className="px-5 py-3.5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6 group hover:bg-white/[0.01] transition-colors"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-start gap-3 min-w-0">
                       <div className="h-5 w-5 rounded bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[10px]  text-slate-400">
                         {modIdx + 1}.{lesIdx + 1}
                       </div>
-                      <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors truncate">{lesson.title}</span>
+                      <span className="text-xs font-medium text-slate-300 group-hover:text-white transition-colors break-words">{lesson.title}</span>
                     </div>
                     
                       <div className="flex w-full md:w-auto justify-end gap-3 shrink-0">

@@ -213,9 +213,57 @@ const generateLesson = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
+const deleteCourse = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.userId;
+
+    const course = await Course.findById(id);
+
+    if (!course) {
+      return res.status(404).json({
+        success: false,
+        message: "Course not found",
+      });
+    }
+
+    if (course.creator.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const modules = await Module.find({ course: id });
+
+    const moduleIds = modules.map((m) => m._id);
+
+    await Lesson.deleteMany({
+      module: { $in: moduleIds },
+    });
+
+    await Module.deleteMany({
+      course: id,
+    });
+
+    await Course.findByIdAndDelete(id);
+
+    return res.json({
+      success: true,
+      message: "Course deleted successfully",
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
 module.exports = {
   createCourseFlow,
   getCourseById,
   getUserCourses,
   generateLesson,
+  deleteCourse,
 };
