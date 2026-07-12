@@ -11,7 +11,45 @@ function LessonView() {
   const { lessonId } = useParams();
   const [loading, setLoading] = useState(true);
   const [lesson, setLesson] = useState(null); // Keep as null initially
+  const [language, setLanguage] = useState("english");
+  const [displayContent, setDisplayContent] = useState([]);
+  const [translationLoading, setTranslationLoading] = useState(false);
+  const handleLanguageChange = async (selectedLanguage) => {
+    setLanguage(selectedLanguage);
 
+    if (selectedLanguage === "english") {
+      setDisplayContent(lesson.content);
+      return;
+    }
+
+    try {
+      setTranslationLoading(true);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/lessons/${lessonId}/translate`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            language: selectedLanguage,
+          }),
+        }
+      );
+
+      const res = await response.json();
+
+      if (res.success) {
+        setDisplayContent(res.data.content);
+      }
+    } catch (err) {
+      console.error("Translation failed:", err);
+    } finally {
+      setTranslationLoading(false);
+    }
+  };
   useEffect(() => {
     const generateLesson = async () => {
       if (!isAuthenticated || !token) {
@@ -43,6 +81,7 @@ function LessonView() {
 
         if (res.success) {
           setLesson(res.data);
+          setDisplayContent(res.data.content);
         }
       } catch (error) {
         console.error("Error while fetching lesson environment:", error);
@@ -96,8 +135,30 @@ function LessonView() {
             <ArrowLeft size={14} className="transform group-hover:-translate-x-0.5 transition-transform" />
             Back to roadmap
           </Link>
+          
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {translationLoading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin text-cyan-400" />
+                  <span className="text-sm text-slate-400">
+                    Translating...
+                  </span>
+                </>
+              ) : (
+                <select
+                  value={language}
+                  onChange={(e) => handleLanguageChange(e.target.value)}
+                  className="h-[34px] px-4 rounded-lg bg-[#111827] border border-slate-700 text-xs font-medium text-slate-300 transition-all focus:outline-none focus:border-cyan-400"
+                >
+                  <option value="english">English</option>
+                  <option value="hinglish">Hinglish</option>
+                </select>
+              )}
+            </div>
 
-          <LessonPDFExporter lesson={lesson} /> {/* Lesson Download Option */}
+            <LessonPDFExporter lesson={lesson} content={displayContent}/>
+          </div>
         </div>
 
         <h1 className="text-3xl md:text-5xl font-medium tracking-tight text-white bg-gradient-to-r from-white via-white to-slate-500 bg-clip-text text-transparent">
@@ -107,7 +168,7 @@ function LessonView() {
 
       {/* Structured Content Blocks */}
       <div className="space-y-10 w-full">
-        {lesson.content && lesson.content.map((block, index) => {
+        {displayContent && displayContent.map((block, index) => {
           // 💡 SAFE fallback: If your AI service returns raw strings instead of blocks, render them directly as a paragraph
           if (typeof block === "string") {
             return (

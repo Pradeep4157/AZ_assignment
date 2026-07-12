@@ -17,6 +17,16 @@ const lessonSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    translations: {
+      type: Map,
+      of: {
+        content: [mongoose.Schema.Types.Mixed],
+        generatedAt: Date,
+        model: String,
+        // audioUrl: String,
+      },
+      default: {},
+    },
   },
   { timestamps: true },
 );

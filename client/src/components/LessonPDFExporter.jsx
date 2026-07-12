@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { jsPDF } from "jspdf";
 import { Download, Loader2 } from "lucide-react";
 import html2canvas from "html2canvas";
-function LessonPDFExporter({ lesson }) {
+function LessonPDFExporter({ lesson, content }) {
   const [exporting, setExporting] = useState(false);
   const printRef = useRef(null);
 
@@ -110,7 +110,7 @@ function LessonPDFExporter({ lesson }) {
           </div>
 
           {/* Content Loop */}
-          {lesson.content?.map((block, idx) => {
+          {content?.map((block, idx) => {
             switch (block.type) {
               case "heading":
                 return (

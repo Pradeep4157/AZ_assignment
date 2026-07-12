@@ -4,10 +4,11 @@ const requireAuth = require("../middleware/auth");
 const { generateLesson } = require("../controllers/courseController");
 const markLessonCompleted = require("../controllers/markLessonCompleted");
 const markLessonIncomplete = require("../controllers/markLessonIncomplete");
+const translateLesson = require("../controllers/translateLesson");
 
 // POST /api/lessons/:lessonId/generate
 router.post("/:lessonId/generate", requireAuth, generateLesson);
 router.patch("/:id/complete", markLessonCompleted);
 router.patch("/:id/incomplete", markLessonIncomplete);
-
+router.patch("/:lessonId/translate", requireAuth, translateLesson);
 module.exports = router;
